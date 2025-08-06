@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- © 2025  Created by Tony Casanova in North Carolina, United States of America. (hidden copyright) -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn RISC-V 64-bit (RV64) - Interactive Tutorial</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; }
+    body::before {
+      content: "© 2025 Tony Casanova, North Carolina, USA";
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-25deg);
+      font-size: 3em;
+      color: #888;
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 9999;
+      white-space: pre;
+    }
+    header { background: #2d3e50; color: #fff; padding: 1.5em 2em; }
+    h1 { margin: 0; }
+    nav { background: #1a232e; padding: 0.5em 2em; }
+    nav button { background: #3b4a5a; color: #fff; border: none; margin-right: 1em; padding: 0.5em 1em; border-radius: 4px; cursor: pointer; }
+    nav button.active { background: #f39c12; color: #222; }
+    section { display: none; padding: 2em; }
+    section.active { display: block; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 2em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: left; }
+    th { background: #e9ecef; }
+    .desc { color: #555; font-size: 0.95em; }
+    .abi-table th, .abi-table td { text-align: center; }
+    .quiz { background: #fff3cd; border: 1px solid #ffeeba; padding: 1em; border-radius: 6px; margin-bottom: 2em; }
+    .quiz input[type="text"] { width: 200px; }
+    .correct { color: green; font-weight: bold; }
+    .incorrect { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Learn RISC-V 64-bit (RV64)</h1>
+    <div>Interactive tutorial and reference for the RV64I base ISA and extensions</div>
+  </header>
+  <nav>
+    <button onclick="showSection('intro')" class="active">Intro</button>
+    <button onclick="showSection('formats')">Instruction Formats</button>
+    <button onclick="showSection('core')">Core Instructions</button>
+    <button onclick="showSection('extensions')">Extensions</button>
+    <button onclick="showSection('registers')">Registers</button>
+    <button onclick="showSection('quiz')">Quiz Yourself</button>
+  </nav>
+  <section id="intro" class="active">
+    <h2>What is RISC-V 64-bit (RV64)?</h2>
+    <p>RISC-V is an open standard instruction set architecture (ISA) based on reduced instruction set computing (RISC) principles. RV64 is the 64-bit version, supporting 64-bit registers, addresses, and data types. It is widely used in modern processors for its simplicity, extensibility, and open ecosystem.</p>
+    <ul>
+      <li><b>Base ISA:</b> RV64I (Integer instructions, 64-bit)</li>
+      <li><b>Extensions:</b> M (Multiply/Divide), A (Atomic), F/D (Floating Point), C (Compressed), and more</li>
+      <li><b>Registers:</b> 32 integer (x0-x31), 32 floating-point (f0-f31)</li>
+      <li><b>Endianness:</b> Little-endian by default</li>
+    </ul>
+    <p>This tutorial covers the basics and lets you interactively explore and test your knowledge!</p>
+  </section>
+  <section id="formats">
+    <h2>Instruction Formats</h2>
+    <table>
+      <tr><th>Type</th><th>Fields</th><th>Description</th></tr>
+      <tr><td>R-type</td><td>opcode, rd, funct3, rs1, rs2, funct7</td><td>Register-register operations</td></tr>
+      <tr><td>I-type</td><td>opcode, rd, funct3, rs1, imm[11:0]</td><td>Immediate, loads, jalr, system</td></tr>
+      <tr><td>S-type</td><td>opcode, imm[4:0], funct3, rs1, rs2, imm[11:5]</td><td>Stores</td></tr>
+      <tr><td>B-type</td><td>opcode, imm[11], imm[4:1], funct3, rs1, rs2, imm[10:5], imm[12]</td><td>Branches</td></tr>
+      <tr><td>U-type</td><td>opcode, rd, imm[31:12]</td><td>LUI, AUIPC</td></tr>
+      <tr><td>J-type</td><td>opcode, rd, imm[20|10:1|11|19:12]</td><td>JAL</td></tr>
+    </table>
+    <p>RV64I adds 64-bit operations and immediate fields are sign-extended to 64 bits where applicable.</p>
+  </section>
+  <section id="core">
+    <h2>Core Integer Instructions (RV64I)</h2>
+    <table>
+      <tr><th>Name</th><th>Format</th><th>Description</th></tr>
+      <tr><td>ADD, SUB</td><td>R</td><td class="desc">rd = rs1 + rs2 / rd = rs1 - rs2</td></tr>
+      <tr><td>SLL, SRL, SRA</td><td>R</td><td class="desc">Shift left/right logical/arithmetic</td></tr>
+      <tr><td>SLT, SLTU</td><td>R</td><td class="desc">Set if less than (signed/unsigned)</td></tr>
+      <tr><td>AND, OR, XOR</td><td>R</td><td class="desc">Bitwise logic</td></tr>
+      <tr><td>ADDI, SLLI, SRLI, SRAI</td><td>I</td><td class="desc">Immediate arithmetic/shift</td></tr>
+      <tr><td>SLTI, SLTIU</td><td>I</td><td class="desc">Set if less than immediate</td></tr>
+      <tr><td>ANDI, ORI, XORI</td><td>I</td><td class="desc">Immediate bitwise logic</td></tr>
+      <tr><td>LB/LH/LW/LWU/LD</td><td>I</td><td class="desc">Load byte/half/word/word unsigned/double</td></tr>
+      <tr><td>SB/SH/SW/SD</td><td>S</td><td class="desc">Store byte/half/word/double</td></tr>
+      <tr><td>BEQ/BNE/BLT/BGE/BLTU/BGEU</td><td>B</td><td class="desc">Conditional branches</td></tr>
+      <tr><td>LUI/AUIPC</td><td>U</td><td class="desc">Load upper immediate / Add upper immediate to PC</td></tr>
+      <tr><td>JAL/JALR</td><td>J/I</td><td class="desc">Jump and link / Jump and link register</td></tr>
+      <tr><td>ECALL/EBREAK</td><td>I</td><td class="desc">System call / Break</td></tr>
+      <tr><td>64-bit only: ADDIW, SLLIW, SRLIW, SRAIW</td><td>R/I</td><td class="desc">Word (32-bit) arithmetic/shift, sign-extended to 64 bits</td></tr>
+    </table>
+  </section>
+  <section id="extensions">
+    <h2>Standard Extensions</h2>
+    <h3>RV64M (Multiply/Divide)</h3>
+    <ul>
+      <li>MUL, MULH, MULHSU, MULHU: 64-bit multiply variants</li>
+      <li>DIV, DIVU, REM, REMU: 64-bit divide/remainder</li>
+      <li>MULW, DIVW, DIVUW, REMW, REMUW: 32-bit word operations, sign-extended to 64 bits</li>
+    </ul>
+    <h3>RV64A (Atomic)</h3>
+    <ul>
+      <li>LR.D/SC.D: 64-bit load-reserved/store-conditional</li>
+      <li>AMOs: 64-bit atomic memory operations</li>
+    </ul>
+    <h3>RV64F/D (Floating Point)</h3>
+    <ul>
+      <li>FLD/FSD: 64-bit floating-point load/store</li>
+      <li>FMV.D.X, FMV.X.D: Move between int and double</li>
+      <li>All single-precision (F) and double-precision (D) arithmetic</li>
+    </ul>
+    <h3>RV64C (Compressed)</h3>
+    <ul>
+      <li>16-bit compressed forms for common 64-bit instructions</li>
+    </ul>
+  </section>
+  <section id="registers">
+    <h2>Register ABI (RV64)</h2>
+    <table class="abi-table">
+      <tr><th>Register</th><th>ABI Name</th><th>Description</th></tr>
+      <tr><td>x0</td><td>zero</td><td>Zero constant</td></tr>
+      <tr><td>x1</td><td>ra</td><td>Return address</td></tr>
+      <tr><td>x2</td><td>sp</td><td>Stack pointer</td></tr>
+      <tr><td>x3</td><td>gp</td><td>Global pointer</td></tr>
+      <tr><td>x4</td><td>tp</td><td>Thread pointer</td></tr>
+      <tr><td>x5-x7</td><td>t0-t2</td><td>Temporaries</td></tr>
+      <tr><td>x8</td><td>s0/fp</td><td>Saved/frame pointer</td></tr>
+      <tr><td>x9</td><td>s1</td><td>Saved register</td></tr>
+      <tr><td>x10-x11</td><td>a0-a1</td><td>Function args/return values</td></tr>
+      <tr><td>x12-x17</td><td>a2-a7</td><td>Function args</td></tr>
+      <tr><td>x18-x27</td><td>s2-s11</td><td>Saved registers</td></tr>
+      <tr><td>x28-x31</td><td>t3-t6</td><td>Temporaries</td></tr>
+    </table>
+    <h3>Floating Point Registers</h3>
+    <ul>
+      <li>f0-7: ft0-7 (temporaries)</li>
+      <li>f8-9: fs0-1 (saved)</li>
+      <li>f10-11: fa0-1 (args/return)</li>
+      <li>f12-17: fa2-7 (args)</li>
+      <li>f18-27: fs2-11 (saved)</li>
+      <li>f28-31: ft8-11 (temporaries)</li>
+    </ul>
+  </section>
+  <section id="quiz">
+    <h2>Quiz Yourself!</h2>
+    <div class="quiz">
+      <div>What does the <b>ADD</b> instruction do in RV64?</div>
+      <input type="text" id="q1" placeholder="Your answer...">
+      <button onclick="checkQuiz('q1','rd = rs1 + rs2')">Check</button>
+      <span id="a1"></span>
+    </div>
+    <div class="quiz">
+      <div>Which register is the stack pointer?</div>
+      <input type="text" id="q2" placeholder="Your answer...">
+      <button onclick="checkQuiz('q2','x2')">Check</button>
+      <span id="a2"></span>
+    </div>
+    <div class="quiz">
+      <div>What is the difference between <b>LD</b> and <b>LWU</b>?</div>
+      <input type="text" id="q3" placeholder="Your answer...">
+      <button onclick="checkQuiz('q3','LD loads 64 bits, LWU loads 32 bits zero-extended')">Check</button>
+      <span id="a3"></span>
+    </div>
+  </section>
+  <script>
+    function showSection(id) {
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+      document.querySelector('nav button[onclick*="' + id + '"]').classList.add('active');
+      document.getElementById(id).classList.add('active');
+    }
+    function checkQuiz(qid, answer) {
+      var user = document.getElementById(qid).value.trim().toLowerCase();
+      var correct = answer.toLowerCase();
+      var result = (user && correct.includes(user)) ? '<span class="correct">Correct!</span>' : '<span class="incorrect">Try again.</span>';
+      document.getElementById('a' + qid[1]).innerHTML = result;
+    }
+  </script>
+  <footer style="background:#e9ecef;color:#333;text-align:center;padding:1em 0;font-size:0.95em;position:fixed;width:100%;bottom:0;left:0;">
+    <div style="font-size:0.8em;">© 2025 Created by Tony Casanova North Carolina, United States of America.</div>
+    <span style="position:absolute;left:-9999px;opacity:0;">© 2025 Created by Tony Casanova North Carolina, United States of America.</span>
+    <div style="display:flex;justify-content:center;">
+      <details style="margin-top:1em;font-size:0.9em;max-width:700px;width:100%;text-align:left;background:#f4f4f4;padding:1em;border-radius:6px;">
+        <summary style="cursor:pointer;font-weight:bold;text-align:center;">MIT License (click to expand)</summary>
+        <div style="margin-top:1em;">
+          Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>
+          The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>
+          THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        </div>
+      </details>
+    </div>
+  </footer>
+</html>
